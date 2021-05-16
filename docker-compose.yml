@@ -1,0 +1,18 @@
+version: "3"
+services:
+  message2category:
+    image: aleks1212v/mess2category:1.1
+    container_name: message2category
+    environment:
+      - discovery.type=single-node
+
+    ports:
+      - 5000:5000
+
+  shell_m2c:
+    image: aleks1212v/shell_m2c:1.1
+    container_name: shellm2c
+    depends_on:
+      - message2category
+    ports:
+      - 80:8501
