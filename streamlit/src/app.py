@@ -10,23 +10,23 @@ import json
 
 import altair as alt
 
-serverhost = 'message2category'
+serverhost = 'localhost'#'message2category'
 serverport = '5000'
 
 currdir = os.getcwd()
 
-def load_username():
-    try:
-        log_path = os.path.join(currdir, r'login.txt')
-        logins = []
-        with open(log_path, 'r') as f:
-            for line in f:
-                l = line.strip('\n')
-                logins.append(l)
-        return logins
-    except Exception:
-        print('Ошибка запроса')
-    return ''
+#def load_username():
+#    try:
+#        log_path = os.path.join(currdir, r'login.txt')
+#        logins = []
+#        with open(log_path, 'r') as f:
+#            for line in f:
+#                l = line.strip('\n')
+#                logins.append(l)
+#        return logins
+#    except Exception:
+#        print('Ошибка запроса')
+#    return ''
 
 def write_content(raw_json):
     top1_category = raw_json['top1_category']
@@ -115,13 +115,12 @@ def write_contents(result_frame):
 
 form = st.sidebar.form(key='my_form')
 
-logins = load_username()
+#logins = load_username()
 form.markdown("### 🎲 Авторизация")
-login = form.selectbox("Перед началом работы, представьтесь: ", logins)
-password = form.text_input("Введите свой пароль, " + login)
-ok_button = form.form_submit_button(label='OK')
-if ok_button:
-    form.write('Пароль введен')
+#login = form.selectbox("Перед началом работы, представьтесь: ", logins)
+login = form.text_input("Перед началом работы, представьтесь: ", "test")
+password = form.text_input("Введите пароль: " , "test", type = "password")
+new_button = form.form_submit_button(label='Создать новый аккаунт')
 
 form_2 = st.sidebar.form(key='form_2')
 num_count = form_2.selectbox("Вывести мои последние запросы в количестве: ", [1, 5, 10, 20, 50, 100])
@@ -134,6 +133,20 @@ delete_button = form_3.form_submit_button(label='Удалить запросы')
 main_form = st.form(key='main_form')
 message = main_form.text_input("Введите текст обращения:" , '')
 analize_button = main_form.form_submit_button(label='Анализировать')
+
+if new_button:
+    keys = {'username':login, 'password': password}
+    r = requests.post(r"http://" + serverhost + ":" + serverport + r"/newuser", params=keys)
+        
+    raw_json = json.loads(r.content.decode('utf-8'))
+    
+    if raw_json == []:
+        st.write('Данные отсутствуют')
+    elif raw_json['result'] != 'SUCCESS':
+        st.write('Невозможно выполнить запрос!')
+        st.write(raw_json)
+    else:
+        st.write('Пользователь успешно добавлен.')
 
 if analize_button:
     if len(message) > 3:

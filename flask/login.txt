@@ -1,9 +1,2 @@
-Harry Potter;1
-Albus Dumbledore;2
-Lord Voldemort;3
-Severus Snape;4
-Draco Malfoy;5
-Dudley Dursley;6
-Rubeus Hagrid;7
-Hermione Granger;8
 admin;admin
+test;test

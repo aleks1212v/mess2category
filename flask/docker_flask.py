@@ -285,7 +285,7 @@ def executor_top3(top1_cat, top1_sbj):
     return executor_dict
 
 
-def check_username():
+def check_username(newuser = False):
     try:
         log_path = os.path.join(currdir, r'flask/login.txt')
         username = request.args.get('username')
@@ -293,8 +293,21 @@ def check_username():
         with open(log_path, 'r') as f:
             for line in f:
                 l, p = [obj.strip('\n') for obj in line.split(';')]
-                if (l == username) and (p == password):
+                if (l == username and newuser) or (l == username and p == password):
                     return True
+    except Exception:
+        print('Ошибка запроса')
+    return False
+
+def make_user():
+    try:
+        log_path = os.path.join(currdir, r'flask/login.txt')
+        username = request.args.get('username')
+        password = request.args.get('password')
+        with open(log_path, 'a') as f:
+            n = f.write('\n' + username + ';' + password)
+            if n == len(username) + len(password) + 2:
+                return True
     except Exception:
         print('Ошибка запроса')
     return False
@@ -615,6 +628,18 @@ def executor_get_request():
     
     return json.dumps({'result': 'SUCCESS', 'message': message, 'executor':executor}).encode('utf-8')
 
+@app.route('/newuser', methods=['POST'])
+def newuser_post_request():  
+    check = check_username(newuser = True)
+    if check:
+        return json.dumps({'result':'Такой пользователь уже существует!'}).encode('utf-8')
+    elif request.args.get('username') == '':
+        return json.dumps({'result':'Введите имя пользователя!'}).encode('utf-8')
+    make = make_user()
+    if not make:
+        return json.dumps({'result': 'ERROR'})
+    
+    return json.dumps({'result': 'SUCCESS'}).encode('utf-8')
 
 
 if __name__ == "__main__":
